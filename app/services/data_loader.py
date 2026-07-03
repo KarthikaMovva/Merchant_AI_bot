@@ -1,104 +1,67 @@
 import json
 from pathlib import Path
 
-from app.models.category import CategoryContext
-from app.models.merchant import MerchantContext
-from app.models.customer import CustomerContext
-from app.models.trigger import TriggerContext
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = BASE_DIR / "data"
 
-DATASET_DIR = BASE_DIR / "data"
 
-
-def load_json(path: Path):
-    with open(path, "r", encoding="utf-8") as file:
-        return json.load(file)
+def read_json(file):
+    with open(file, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 class DatasetLoader:
 
     def __init__(self):
 
-        self.categories: dict[str, CategoryContext] = {}
-        self.merchants: dict[str, MerchantContext] = {}
-        self.customers: dict[str, CustomerContext] = {}
-        self.triggers: dict[str, TriggerContext] = {}
+        self.categories = {}
+        self.merchants = {}
+        self.customers = {}
+        self.triggers = {}
 
         self.load()
 
-    def load_categories(self):
-
-        category_dir = DATASET_DIR / "categories"
-
-        for file in category_dir.glob("*.json"):
-
-            data = load_json(file)
-
-            category = CategoryContext.model_validate(data)
-
-            self.categories[category.slug] = category
-
-    def load_merchants(self):
-
-        merchant_dir = DATASET_DIR / "merchants"
-
-        for file in merchant_dir.glob("*.json"):
-
-            data = load_json(file)
-
-            merchant = MerchantContext.model_validate(data)
-
-            self.merchants[merchant.merchant_id] = merchant
-
-    def load_customers(self):
-
-        customer_dir = DATASET_DIR / "customers"
-
-        for file in customer_dir.glob("*.json"):
-
-            data = load_json(file)
-
-            customer = CustomerContext.model_validate(data)
-
-            self.customers[customer.customer_id] = customer
-
-    def load_triggers(self):
-
-        trigger_dir = DATASET_DIR / "triggers"
-
-        for file in trigger_dir.glob("*.json"):
-
-            data = load_json(file)
-
-            trigger = TriggerContext.model_validate(data)
-
-            self.triggers[trigger.id] = trigger
-
     def load(self):
 
-        self.load_categories()
-        self.load_merchants()
-        self.load_customers()
-        self.load_triggers()
+        categories = DATA_DIR / "categories"
 
-    def get_category(self, slug: str):
-        return self.categories.get(slug)
+        for file in categories.glob("*.json"):
+            data = read_json(file)
+            self.categories[data["slug"]] = data
 
+        merchants = read_json(DATA_DIR / "merchants_seed.json")
 
-    def get_merchant(self, merchant_id: str):
+        for merchant in merchants["merchants"]:
+            self.merchants[merchant["merchant_id"]] = merchant
+
+        customers = read_json(DATA_DIR / "customers_seed.json")
+
+        for customer in customers["customers"]:
+            self.customers[customer["customer_id"]] = customer
+
+        triggers = read_json(DATA_DIR / "triggers_seed.json")
+
+        for trigger in triggers["triggers"]:
+            self.triggers[trigger["id"]] = trigger
+
+        print(f"Loaded {len(self.categories)} categories")
+        print(f"Loaded {len(self.merchants)} merchants")
+        print(f"Loaded {len(self.customers)} customers")
+        print(f"Loaded {len(self.triggers)} triggers")
+
+    def get_merchant(self, merchant_id):
         return self.merchants.get(merchant_id)
 
-
-    def get_trigger(self, trigger_id: str):
-        return self.triggers.get(trigger_id)
-
-
-    def get_customer(self, customer_id: str):
+    def get_customer(self, customer_id):
         if customer_id is None:
             return None
         return self.customers.get(customer_id)
+
+    def get_category(self, slug):
+        return self.categories.get(slug)
+
+    def get_trigger(self, trigger_id):
+        return self.triggers.get(trigger_id)
 
 
 dataset = DatasetLoader()
