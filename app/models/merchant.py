@@ -9,6 +9,7 @@ class MerchantIdentity(BaseModel):
     place_id: str
     verified: bool
     languages: List[str]
+
     owner_first_name: Optional[str] = None
     established_year: Optional[int] = None
 
@@ -16,45 +17,57 @@ class MerchantIdentity(BaseModel):
 class Subscription(BaseModel):
     status: str
     plan: str
-    days_remaining: int
+
+    days_remaining: Optional[int] = None
+    renewed_at: Optional[str] = None
     days_since_expiry: Optional[int] = None
 
 
 class PerformanceDelta(BaseModel):
-    views_pct: float
-    calls_pct: float
-    ctr_pct: float
+    views_pct: Optional[float] = None
+    calls_pct: Optional[float] = None
+    ctr_pct: Optional[float] = None
 
 
 class PerformanceSnapshot(BaseModel):
-    window_days: int
-    views: int
-    calls: int
-    directions: int
-    ctr: float
-    leads: int
-    delta_7d: PerformanceDelta
+    window_days: Optional[int] = None
+    views: Optional[int] = None
+    calls: Optional[int] = None
+    directions: Optional[int] = None
+    ctr: Optional[float] = None
+    leads: Optional[int] = None
+
+    delta_7d: Optional[PerformanceDelta] = None
 
 
 class MerchantOffer(BaseModel):
     id: str
     title: str
     status: str
+
     started: Optional[str] = None
     ended: Optional[str] = None
 
 
 class CustomerAggregate(BaseModel):
-    total_unique_ytd: int
-    lapsed_180d_plus: int
-    retention_6mo_pct: float
-    high_risk_adult_count: int
+    total_unique_ytd: Optional[int] = None
+
+    lapsed_180d_plus: Optional[int] = None
+    retention_6mo_pct: Optional[float] = None
+
+    retention_3mo_pct: Optional[float] = None
+    repeat_customer_pct: Optional[float] = None
+    monthly_churn_pct: Optional[float] = None
+
+    high_risk_adult_count: Optional[int] = None
+
 
 class ReviewTheme(BaseModel):
-    theme: str
-    sentiment: str
-    occurrences_30d: int
-    common_quote: str
+    theme: Optional[str] = None
+    sentiment: Optional[str] = None
+    occurrences_30d: Optional[int] = None
+
+    common_quote: Optional[str] = None
 
 
 class MerchantContext(BaseModel):
@@ -62,15 +75,17 @@ class MerchantContext(BaseModel):
     category_slug: str
 
     identity: MerchantIdentity
-    subscription: Subscription
-    performance: PerformanceSnapshot
 
-    offers: List[MerchantOffer]
+    subscription: Optional[Subscription] = None
 
-    conversation_history: List[dict]
+    performance: Optional[PerformanceSnapshot] = None
 
-    customer_aggregate: CustomerAggregate
+    offers: List[MerchantOffer] = []
 
-    signals: List[str]
+    conversation_history: List[dict] = []
 
-    review_themes: List[ReviewTheme]
+    customer_aggregate: Optional[CustomerAggregate] = None
+
+    signals: List[str] = []
+
+    review_themes: List[ReviewTheme] = []

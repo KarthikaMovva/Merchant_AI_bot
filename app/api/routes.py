@@ -3,6 +3,9 @@ from fastapi import APIRouter, HTTPException
 from app.models.request import ComposeRequest
 from app.models.response import ComposeResponse
 from app.services.message_service import MessageService
+from app.models.tick_request import TickRequest
+from app.models.tick_response import TickResponse
+import traceback
 
 
 router = APIRouter()
@@ -40,27 +43,27 @@ def metadata():
     }
 
 
-@router.post(
-    "/tick",
-    response_model=ComposeResponse,
-)
-def compose_message(
-    request: ComposeRequest,
-):
+@router.post("/tick", response_model=TickResponse)
+def tick(request: TickRequest):
 
     try:
 
-        response = message_service.compose(
+        return message_service.compose(
             merchant_id=request.merchant_id,
             trigger_id=request.trigger_id,
             customer_id=request.customer_id,
         )
 
-        return response
-
-    except Exception as e:
+    except ValueError as e:
 
         raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(
             status_code=500,
-            detail=str(e),
+            detail=str(e)
         )

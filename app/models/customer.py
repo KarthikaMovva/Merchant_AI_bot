@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -13,7 +13,9 @@ class Relationship(BaseModel):
     first_visit: str
     last_visit: str
     visits_total: int
-    services_received: List[str]
+
+    services_received: List[str] = []
+
     lifetime_value: int
 
 
@@ -21,6 +23,8 @@ class Preferences(BaseModel):
     preferred_slots: str
     channel: str
     reminder_opt_in: bool
+
+    preferred_stylist: Optional[str] = None
 
 
 class Consent(BaseModel):

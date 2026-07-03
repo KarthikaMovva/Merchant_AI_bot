@@ -6,19 +6,16 @@ class TriggerContext(BaseModel):
     id: str
 
     scope: str
-
     kind: str
-
     source: str
 
-    merchant_id: Optional[str] = None
-
+    merchant_id: str
     customer_id: Optional[str] = None
 
-    payload: Dict[str, Any]
+    payload: Dict[str, Any] = {}
 
     urgency: int
 
     suppression_key: str
 
-    expires_at: str
+    expires_at: Optional[str] = None
